@@ -4,34 +4,59 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#123b5d">
-  <title>SIMPANG — Scanner Pembayaran</title>
+  <title>SIMPANG — Pembayaran Angkot Sekolah</title>
   <style>
-    :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#17324a;background:#f3f6fa}*{box-sizing:border-box}body{margin:0;padding:20px}.wrap{max-width:620px;margin:24px auto}.card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:22px;box-shadow:0 8px 30px #15324a12}.brand{display:flex;align-items:center;gap:12px;margin-bottom:18px}.mark{display:grid;place-items:center;width:44px;height:44px;border-radius:13px;background:#123b5d;color:#fff;font-weight:800;font-size:22px}.brand b{font-size:20px}.brand small{display:block;color:#64748b}.lead{color:#53677a;margin-top:0}#reader{width:100%;max-width:440px;margin:18px auto;border-radius:12px;overflow:hidden}input{width:100%;padding:14px;border:1px solid #cbd5e1;border-radius:10px;font-size:16px;margin:8px 0 12px}button{border:0;border-radius:10px;padding:13px 17px;font-size:15px;font-weight:700;cursor:pointer}.primary{background:#145b89;color:#fff}.light{background:#eaf0f5;color:#17324a}.actions{display:flex;gap:10px;flex-wrap:wrap}.actions button{flex:1}.muted{font-size:13px;color:#64748b;line-height:1.5}.result{background:#eef5fa;padding:13px;border-radius:10px;margin:12px 0;overflow-wrap:anywhere}.error{color:#a12b2b}.hidden{display:none!important}hr{border:0;border-top:1px solid #e5eaf0;margin:22px 0}
+    :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#17324a;background:#f2f6fa}*{box-sizing:border-box}body{margin:0;padding:18px}.wrap{max-width:720px;margin:18px auto}.card{background:#fff;border:1px solid #e1e9f0;border-radius:20px;padding:22px;box-shadow:0 10px 32px #15324a12;margin-bottom:16px}.brand{display:flex;align-items:center;gap:12px;margin-bottom:16px}.mark{display:grid;place-items:center;width:46px;height:46px;border-radius:14px;background:#123b5d;color:#fff;font-weight:900;font-size:24px}.brand b{font-size:22px;letter-spacing:1px}.brand small{display:block;color:#64748b}.lead{color:#53677a;margin:0 0 12px}.sub{font-size:13px;color:#64748b;line-height:1.5}#reader{width:100%;max-width:470px;margin:16px auto;border-radius:14px;overflow:hidden;min-height:80px}.actions{display:flex;gap:10px;flex-wrap:wrap}.actions button{flex:1;min-width:130px}button{border:0;border-radius:11px;padding:13px 17px;font-size:15px;font-weight:750;cursor:pointer}.primary{background:#145b89;color:#fff}.light{background:#eaf0f5;color:#17324a}.login{display:block;text-align:center;text-decoration:none;background:#123b5d;color:#fff;padding:14px;border-radius:11px;font-weight:750}.field{display:block;font-weight:700;margin:12px 0 6px}input{width:100%;padding:14px;border:1px solid #cbd5e1;border-radius:11px;font-size:16px;margin:7px 0 12px}.status{padding:13px;border-radius:11px;background:#edf4f9;color:#40576a;margin:14px 0;line-height:1.5}.status.good{background:#e8f7ef;color:#12663f}.status.bad{background:#fff0f0;color:#a12b2b}.hidden{display:none!important}.receipt{text-align:center;background:#f0f8f3;border:1px solid #c8ead5;padding:18px;border-radius:14px;margin-top:14px}.receipt h2{color:#16865b;margin:6px 0}.receipt .amount{font-size:30px;font-weight:850;color:#123b5d}.tag{font-size:12px;color:#64748b;text-align:center;margin-top:14px}
   </style>
 </head>
 <body>
-  <main class="wrap"><section class="card">
-    <div class="brand"><div class="mark">S</div><div><b>SIMPANG</b><small>Scanner pembayaran angkutan sekolah</small></div></div>
-    <p class="lead">Pindai QR siswa menggunakan kamera, atau ketik ID User secara manual.</p>
+<main class="wrap">
+  <section class="card">
+    <div class="brand"><div class="mark">S</div><div><b>SIMPANG</b><small>Sistem Manajemen Pembayaran Angkot</small></div></div>
+    <p class="lead">Pindai QR siswa atau masukkan ID User. Pembayaran akan langsung dicatat jika siswa belum membayar hari ini.</p>
     <div id="reader"></div>
-    <div class="actions"><button class="primary" id="start">Aktifkan kamera</button><button class="light" id="stop">Hentikan kamera</button></div>
-    <p id="status" class="muted" role="status">Kamera membutuhkan izin browser dan koneksi HTTPS. Jika kamera gagal, gunakan input manual.</p>
-    <hr>
-    <label for="studentId"><b>ID User siswa</b></label>
-    <input id="studentId" autocomplete="off" placeholder="Contoh: SISWA001">
-    <div class="result hidden" id="picked"></div>
-    <button class="primary" id="continue" style="width:100%">Lanjutkan ke SIMPANG</button>
-    <p class="muted">Setelah dilanjutkan, SIMPANG akan meminta login jika belum ada sesi aktif. Pemeriksaan siswa dan pencatatan pembayaran tetap dilakukan di aplikasi Google Apps Script.</p>
-  </section></main>
-  <script src="config.js"></script>
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-  <script>
-    const $=id=>document.getElementById(id);let scanner=null;
-    function setStatus(message,isError=false){$('status').textContent=message;$('status').className=isError?'muted error':'muted';}
-    function setId(value){const id=String(value||'').trim();$('studentId').value=id;$('picked').textContent=id?'ID terbaca: '+id:'';$('picked').classList.toggle('hidden',!id);}
-    $('start').addEventListener('click',async()=>{try{if(!window.isSecureContext)throw new Error('Halaman bukan HTTPS. Buka melalui GitHub Pages.');if(!window.Html5Qrcode)throw new Error('Library pemindai belum termuat. Periksa koneksi internet lalu muat ulang.');if(!scanner)scanner=new Html5Qrcode('reader');await scanner.start({facingMode:'environment'},{fps:10,qrbox:{width:230,height:230}},async text=>{try{if(scanner&&scanner.isScanning)await scanner.stop()}catch(_){}setId(text);setStatus('QR berhasil dibaca. Periksa ID User lalu tekan Lanjutkan ke SIMPANG.');},()=>{});setStatus('Kamera aktif. Arahkan ke QR Code siswa.');}catch(e){setStatus((e&&e.message)||String(e),true);}});
-    $('stop').addEventListener('click',async()=>{try{if(scanner&&scanner.isScanning)await scanner.stop();setStatus('Kamera dihentikan.');}catch(e){setStatus(e.message||String(e),true);}});
-    $('continue').addEventListener('click',async()=>{const id=$('studentId').value.trim();if(!id){setStatus('Masukkan atau pindai ID User terlebih dahulu.',true);return;}const base=window.SIMPANG_CONFIG&&window.SIMPANG_CONFIG.appsScriptUrl;if(!base||base.includes('TEMPEL_URL')||!/^https:\/\/script\.google\.com\/macros\/s\//.test(base)){setStatus('URL Web App Apps Script belum diatur. Isi appsScriptUrl pada file config.js.',true);return;}try{const url=new URL(base);url.searchParams.set('scanId',id);window.location.assign(url.toString());}catch(e){setStatus('URL Apps Script pada config.js tidak valid.',true);}});
-  </script>
+    <div class="actions"><button class="primary" id="start">Aktifkan Kamera</button><button class="light" id="stop">Hentikan Kamera</button></div>
+    <p id="status" class="status" role="status">Arahkan kamera ke QR Code siswa. Kamera memerlukan izin browser dan koneksi HTTPS.</p>
+    <form id="manualForm">
+      <label class="field" for="studentId">Input ID User secara manual</label>
+      <input id="studentId" autocomplete="off" placeholder="Contoh: SISWA001" required>
+      <button class="primary" type="submit" style="width:100%">Proses Pembayaran</button>
+    </form>
+    <div id="receipt" class="hidden"></div>
+    <p class="sub">Ketentuan: satu siswa hanya dapat melakukan pembayaran satu kali per hari. Pembayaran harian Rp2.000, sesuai tarif yang diatur di SIMPANG. Hari operasional Senin–Sabtu.</p>
+  </section>
+  <section class="card">
+    <b>Login Admin / Petugas</b>
+    <p class="sub">Masuk untuk membuka dashboard, mengelola data siswa, melihat transaksi, dan membuat laporan. Menu pemindaian tidak tersedia di dalam dashboard.</p>
+    <a class="login" id="adminLogin" href="#">Login Admin / Petugas</a>
+  </section>
+  <p class="tag">SIMPANG · Pembayaran angkutan sekolah</p>
+</main>
+<script src="config.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+  const $=id=>document.getElementById(id);let scanner=null,busy=false;
+  const base=window.SIMPANG_CONFIG&&window.SIMPANG_CONFIG.appsScriptUrl;
+  $('adminLogin').href=base||'#';
+  function setStatus(msg,type=''){const el=$('status');el.textContent=msg;el.className='status'+(type?' '+type:'');}
+  function stopCamera(){try{if(scanner&&scanner.isScanning)return scanner.stop();}catch(e){}return Promise.resolve();}
+  function jsonpPayment(id){return new Promise((resolve,reject)=>{
+    const callback='simpangCb_'+Date.now()+'_'+Math.floor(Math.random()*100000);
+    const script=document.createElement('script');let timer;
+    const cleanup=()=>{clearTimeout(timer);delete window[callback];script.remove();};
+    window[callback]=data=>{cleanup();resolve(data);};
+    script.onerror=()=>{cleanup();reject(new Error('Tidak dapat menghubungi server SIMPANG. Periksa koneksi atau URL Web App.'));};
+    const url=new URL(base);url.searchParams.set('action','pay');url.searchParams.set('id',id);url.searchParams.set('callback',callback);script.src=url.toString();
+    timer=setTimeout(()=>{cleanup();reject(new Error('Server terlalu lama merespons. Silakan coba lagi.'));},25000);
+    document.body.appendChild(script);
+  });}
+  function showPayment(p){$('receipt').classList.remove('hidden');$('receipt').innerHTML=`<div class="receipt"><b>✓ PEMBAYARAN BERHASIL</b><h2>${safe(p.student.name)}</h2><p>ID: ${safe(p.student.id)} · Kelas ${safe(p.student.className)}</p><div class="amount">${money(p.amount)}</div><p>${safe(p.date)} · ${safe(p.time)}</p><small>No. transaksi: ${safe(p.id)}</small></div>`;}
+  function safe(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function money(n){return 'Rp'+Number(n||0).toLocaleString('id-ID');}
+  async function processId(raw){const id=String(raw||'').trim();if(!id||busy)return;busy=true;$('receipt').classList.add('hidden');setStatus('Memeriksa ID siswa dan mencatat pembayaran…');try{await stopCamera();if(!base||!/^https:\/\/script\.google\.com\/macros\/s\//.test(base))throw new Error('URL Web App Apps Script belum benar. Periksa config.js.');const r=await jsonpPayment(id);if(!r||!r.ok)throw new Error(r&&r.error?r.error:'Respons server tidak valid.');showPayment(r.payment);$('studentId').value='';setStatus('Pembayaran berhasil dicatat di SIMPANG.','good');}catch(e){setStatus(e.message||String(e),'bad');}finally{busy=false;}}
+  $('start').addEventListener('click',async()=>{try{if(!window.isSecureContext)throw new Error('Halaman harus dibuka melalui HTTPS.');if(!window.Html5Qrcode)throw new Error('Library scanner belum termuat. Muat ulang halaman.');if(!scanner)scanner=new Html5Qrcode('reader');await scanner.start({facingMode:'environment'},{fps:10,qrbox:{width:230,height:230}},text=>processId(text.trim()),()=>{});setStatus('Kamera aktif. Arahkan ke QR Code siswa.');}catch(e){setStatus(e.message||String(e),'bad');}});
+  $('stop').addEventListener('click',async()=>{await stopCamera();setStatus('Kamera dihentikan.');});
+  $('manualForm').addEventListener('submit',e=>{e.preventDefault();processId($('studentId').value);});
+</script>
 </body>
 </html>
