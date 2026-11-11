@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123b5d">
+  <title>SIMPANG — Scanner Pembayaran</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#17324a;background:#f3f6fa}*{box-sizing:border-box}body{margin:0;padding:20px}.wrap{max-width:620px;margin:24px auto}.card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:22px;box-shadow:0 8px 30px #15324a12}.brand{display:flex;align-items:center;gap:12px;margin-bottom:18px}.mark{display:grid;place-items:center;width:44px;height:44px;border-radius:13px;background:#123b5d;color:#fff;font-weight:800;font-size:22px}.brand b{font-size:20px}.brand small{display:block;color:#64748b}.lead{color:#53677a;margin-top:0}#reader{width:100%;max-width:440px;margin:18px auto;border-radius:12px;overflow:hidden}input{width:100%;padding:14px;border:1px solid #cbd5e1;border-radius:10px;font-size:16px;margin:8px 0 12px}button{border:0;border-radius:10px;padding:13px 17px;font-size:15px;font-weight:700;cursor:pointer}.primary{background:#145b89;color:#fff}.light{background:#eaf0f5;color:#17324a}.actions{display:flex;gap:10px;flex-wrap:wrap}.actions button{flex:1}.muted{font-size:13px;color:#64748b;line-height:1.5}.result{background:#eef5fa;padding:13px;border-radius:10px;margin:12px 0;overflow-wrap:anywhere}.error{color:#a12b2b}.hidden{display:none!important}hr{border:0;border-top:1px solid #e5eaf0;margin:22px 0}
+  </style>
+</head>
+<body>
+  <main class="wrap"><section class="card">
+    <div class="brand"><div class="mark">S</div><div><b>SIMPANG</b><small>Scanner pembayaran angkutan sekolah</small></div></div>
+    <p class="lead">Pindai QR siswa menggunakan kamera, atau ketik ID User secara manual.</p>
+    <div id="reader"></div>
+    <div class="actions"><button class="primary" id="start">Aktifkan kamera</button><button class="light" id="stop">Hentikan kamera</button></div>
+    <p id="status" class="muted" role="status">Kamera membutuhkan izin browser dan koneksi HTTPS. Jika kamera gagal, gunakan input manual.</p>
+    <hr>
+    <label for="studentId"><b>ID User siswa</b></label>
+    <input id="studentId" autocomplete="off" placeholder="Contoh: SISWA001">
+    <div class="result hidden" id="picked"></div>
+    <button class="primary" id="continue" style="width:100%">Lanjutkan ke SIMPANG</button>
+    <p class="muted">Setelah dilanjutkan, SIMPANG akan meminta login jika belum ada sesi aktif. Pemeriksaan siswa dan pencatatan pembayaran tetap dilakukan di aplikasi Google Apps Script.</p>
+  </section></main>
+  <script src="config.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script>
+    const $=id=>document.getElementById(id);let scanner=null;
+    function setStatus(message,isError=false){$('status').textContent=message;$('status').className=isError?'muted error':'muted';}
+    function setId(value){const id=String(value||'').trim();$('studentId').value=id;$('picked').textContent=id?'ID terbaca: '+id:'';$('picked').classList.toggle('hidden',!id);}
+    $('start').addEventListener('click',async()=>{try{if(!window.isSecureContext)throw new Error('Halaman bukan HTTPS. Buka melalui GitHub Pages.');if(!window.Html5Qrcode)throw new Error('Library pemindai belum termuat. Periksa koneksi internet lalu muat ulang.');if(!scanner)scanner=new Html5Qrcode('reader');await scanner.start({facingMode:'environment'},{fps:10,qrbox:{width:230,height:230}},async text=>{try{if(scanner&&scanner.isScanning)await scanner.stop()}catch(_){}setId(text);setStatus('QR berhasil dibaca. Periksa ID User lalu tekan Lanjutkan ke SIMPANG.');},()=>{});setStatus('Kamera aktif. Arahkan ke QR Code siswa.');}catch(e){setStatus((e&&e.message)||String(e),true);}});
+    $('stop').addEventListener('click',async()=>{try{if(scanner&&scanner.isScanning)await scanner.stop();setStatus('Kamera dihentikan.');}catch(e){setStatus(e.message||String(e),true);}});
+    $('continue').addEventListener('click',async()=>{const id=$('studentId').value.trim();if(!id){setStatus('Masukkan atau pindai ID User terlebih dahulu.',true);return;}const base=window.SIMPANG_CONFIG&&window.SIMPANG_CONFIG.appsScriptUrl;if(!base||base.includes('TEMPEL_URL')||!/^https:\/\/script\.google\.com\/macros\/s\//.test(base)){setStatus('URL Web App Apps Script belum diatur. Isi appsScriptUrl pada file config.js.',true);return;}try{const url=new URL(base);url.searchParams.set('scanId',id);window.location.assign(url.toString());}catch(e){setStatus('URL Apps Script pada config.js tidak valid.',true);}});
+  </script>
+</body>
+</html>
