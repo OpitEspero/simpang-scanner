@@ -36,6 +36,9 @@
   .footer{width:100%;flex-wrap:wrap;line-height:1.6}
 }
 
+
+.brand-icon{display:grid!important;place-items:center!important;overflow:hidden!important;background:linear-gradient(145deg,#18c8ff,#1762c9)!important;color:#fff!important;font-size:27px!important;font-weight:900!important;line-height:1!important;text-indent:0!important;background-image:none!important;border:0!important;object-fit:unset!important}
+.brand-icon::before{content:none!important}
 </style>
 </head>
 <body><main class="page">
@@ -45,7 +48,7 @@
 <aside class="glass side-card"><div class="side-icon">✧</div><div><h3>Pembayaran Angkot</h3><p>Setelah QR berhasil dipindai, sistem akan memvalidasi data siswa dan mencatat pembayaran secara otomatis jika belum membayar hari ini.</p></div><div class="fare"><span>💠 &nbsp;Tarif harian</span><b>Rp2.000</b></div><p style="margin:12px 0 0">Operasional Senin–Sabtu · Satu pembayaran per siswa setiap hari.</p></aside></section>
 <footer class="footer"><span><strong>SIMPANG</strong> &nbsp;·&nbsp; Scan, Bayar, Berangkat</span><span>&copy; 2026 opit_espero. All rights reserved.</span></footer>
 </main>
-<script src="config.js"></script><script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="config.js?v=8"></script><script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
   const $=id=>document.getElementById(id);let scanner=null,busy=false;
   const base=window.SIMPANG_CONFIG&&window.SIMPANG_CONFIG.appsScriptUrl;
